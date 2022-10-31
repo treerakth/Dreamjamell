@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <base target="_top">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+        
+    </head>
+    <body>
+        <div class="container">
+            <br>
+            <div class="row">
+              <div class="col">
+            
+                  <!-- ## SEARCH FORM ------------------------------------------------ -->
+                  <center><form id="search-form" onsubmit="handleFormSubmit(this)">
+                    <div class="form-group mb-2">
+                      <img src="https://imgur.com/Yq1wYSV.jpg"  width="739" height="578"><br>
+                      <br><h3><label for="searchtext">ใส่ชื่อแอคเค้าท์ Twitter (มี @)</h3></label>
+                    </div><p>
+                    <div class="col-md-6 mb-2">
+                      <input type="text" class="form-control" id="searchtext" name="searchtext" placeholder="Twitter id (มี @)">
+                    </div><p>
+                    <button id="search" type="submit" class="btn btn-success mb-2">ค้นหา</button>
+                    <span id="spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                  </form>
+                  </center>
+                  <!-- ## SEARCH FORM ~ END ------------------------------------------- -->
+              
+              </div>    
+            </div>
+            <div class="row">
+              <div class="col">
+            
+                <!-- ## TABLE OF SEARCH RESULTS ------------------------------------------------ -->
+                <div id="search-results" class="table-responsive">
+                  <!-- The Data Table is inserted here by JavaScript -->
+                </div>
+                <!-- ## TABLE OF SEARCH RESULTS ~ END ------------------------------------------------ -->
+                  
+              </div>
+            </div>
+        </div>
+ 
+       <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js" integrity="sha384-q2kxQ16AaE6UbzuKqyBE9/u/KzioAlnx2maXQHiDX9d4/zp8Ok3f+M7DPm+Ib6IU" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.min.js" integrity="sha384-pQQkAEnwaBkjpqZ8RU1fF1AKtTcHJwFl3pblpTlHXybJjHpMYo79HY3hIi4NKxyj" crossorigin="anonymous"></script>
+ 
+        <!--##JAVASCRIPT FUNCTIONS ---------------------------------------------------- -->
+        <script>
+          //PREVENT FORMS FROM SUBMITTING / PREVENT DEFAULT BEHAVIOUR
+          function preventFormSubmit() {
+            var forms = document.querySelectorAll('form');
+            for (var i = 0; i < forms.length; i++) {
+              forms[i].addEventListener('submit', function(event) {
+              event.preventDefault();
+              });
+            }
+          }
+          window.addEventListener("load", preventFormSubmit, true); 
+             
+          
+          //HANDLE FORM SUBMISSION
+          function handleFormSubmit(formObject) {
+            document.getElementById('search').innerHTML = "Loading";
+            document.getElementById('spinner').classList.remove("d-none");
+            google.script.run.withSuccessHandler(createTable).processForm(formObject);
+            document.getElementById("search-form").reset();
+          }
+        
+          //CREATE THE DATA TABLE
+          function createTable(dataArray) {
+            document.getElementById('search').innerHTML = "Search";
+            document.getElementById('spinner').classList.add("d-none");
+            if(dataArray && dataArray !== undefined && dataArray.length != 0){
+              var result = "<table class='table table-sm table-striped' id='dtable' style='font-size:1.5em'>"+
+                           "<thead style='white-space: nowrap'>"+
+                             "<tr>"+                               //Change table headings to match witht he Google Sheet
+                              "<th scope='col'>TWITTER ACCOUNT</th>"+
+                              "<th scope='col'>TRACKING NUMBER</th>"+
+                              "<th scope='col'>DELIVERY BY</th>"+
+                              "<th scope='col'>DATE</th>"+
+                            "</tr>"+
+                          "</thead>";
+              for(var i=0; i<dataArray.length; i++) {
+                  result += "<tr>";
+                  for(var j=0; j<dataArray[i].length; j++){
+                      result += "<td>"+dataArray[i][j]+"</td>";
+                  }
+                  result += "</tr>";
+              }
+              result += "</table>";
+              var div = document.getElementById('search-results');
+              div.innerHTML = result;
+            }else{
+              var div = document.getElementById('search-results');
+              // //div.empty()
+              div.innerHTML = "ไม่พบเจอข้อมูล!";
+            }
+ 
+          }
+ 
+          
+        </script>
+        <!--##JAVASCRIPT FUNCTIONS ~ END ---------------------------------------------------- -->
+ 
+    </body>
+</html>
